@@ -25,11 +25,10 @@ function capetrials_custom_migration_colorbox(Row $row, MigrateSourceInterface $
   drush_print_r($migration->id());
   if (substr($migration->id(), 0, $len) == CUSTOM_MIGRATION_PREFIX . 'node') {
     foreach ($text_fields as $text_field) {
-      drush_print_r($text_field);
+      drush_print_r($row);
       $value = $row->getSourceProperty($text_field);
-      drush_print_r("value=" . $value);
-      if (!empty($value) && preg_match('/lightbox/', $value)) {
-        drush_print_r("lightbox regex value=" . $value);
+      if (!empty($value) && preg_match('/img/', $value)) {
+        drush_print_r("*****>>>>> regex value=\n" . $value . "\n");
         // $value[0]['format'] = $format_map[$format];
         // $row->setSourceProperty($text_field, $value);
       }
