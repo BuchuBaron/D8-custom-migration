@@ -9,6 +9,7 @@
  * These need to be decorated to work with colorbox since lightbox has no D8
  * version.
  */
+
 use Drupal\migrate\Row;
 use Drupal\migrate\Plugin\MigrateSourceInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
@@ -26,8 +27,7 @@ function capetrials_custom_migration_colorbox(Row $row, MigrateSourceInterface $
   if (substr($migration->id(), 0, $len) == CUSTOM_MIGRATION_PREFIX . 'node') {
     foreach ($text_fields as $text_field) {
       $value = $row->getSourceProperty($text_field);
-      if (!empty($value) && preg_match('/emotions/', $value)) {
-        drush_print_r($row);
+      if (!empty($value) && preg_match('/img/', $value)) {
         drush_print_r("*****>>>>> value=");
         // Replace "sites/all/libraries/tinymce/jscripts/tiny_mce/plugins/emotions/img/smiley-wink.gif" with public://img/
         $value = preg_replace(
@@ -38,20 +38,34 @@ function capetrials_custom_migration_colorbox(Row $row, MigrateSourceInterface $
           'src="/sites/capetrials.co.za/files/img/', 
           $value
         );
-        drush_print_r($value);
 
         // <a href="http://capetrials.co.za/sites/capetrials.co.za/files/imagecache/wysiwyg_imageupload_lightbox_preset/wysiwyg_imageupload/7/IMG-20120909-00084_1.jpg" rel="lightbox[wysiwyg_imageupload_inline]" class="lightbox-processed">[[wysiwyg_imageupload:147:]]</a>
+        // [[wysiwyg_imageupload:37:]]
+        // in wysiwyg_imageupload_entity with iid=37: fid=74, title='blah blah'
+        // in files with fid=74: uid=1, filename=rock.jpg =>
+        //   path=files/wysiwyg_imageupload/1/rock.jpg, or files/ckutils/rock.jpg
+        //
+        // Replace with:
+        // <a href="/sites/capetrials.co.za/files/ckutils/rock.jpg" class="colorbox">
+        //   <img src="/sites/capetrials.co.za/files/ckutils/rock.jpg" title="$title" align="center" />
+        // </a>
+        while (preg_match('/<a href="([^"])" rel="lightbox.*" [^>]*>\[\[wysiwyg_imageupload:([0-9]*):\]\]</a>', $value, $args)) {
+          drush_print_r($value);
+          drush_print_r($args);
+        }
+
 
         // <a href="/sites/capetrials.co.za/files/ckutils/CottonExpert220.jpg" rel="lightbox[http://]" style="display:block;margin:0 auto"><img src="/sites/capetrials.co.za/files/ckutils/CottonExpert220_small.jpg" /></a>
 
         // <a class="lightbox lightbox-processed" title="A little cut" href="http://bmwmotorcycleclubcape.co.za/sites/bmwmotorcycleclubcape.co.za/files/images/wound.jpg" rel="lightbox[http://]"><img class="image image-half300 " title="A little cut" src="http://bmwmotorcycleclubcape.co.za/sites/bmwmotorcycleclubcape.co.za/files/images/wound.half300.jpg" alt="A little cut" height="225" width="300"></a>
 
-        // Set the body format as full_html
 
 
-        $row->setSourceProperty($text_field, $value);
+        // $row->setSourceProperty($text_field, $value);
       }
     }
+    // Set the body format as full_html
+    // $row->setSourceProperty('format', 'full_html');
   }
 }
 
