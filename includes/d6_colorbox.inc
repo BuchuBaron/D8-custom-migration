@@ -42,15 +42,6 @@ function capetrials_custom_migration_colorbox(Row $row, MigrateSourceInterface $
         }
 
         // <a href="http://capetrials.co.za/sites/capetrials.co.za/files/imagecache/wysiwyg_imageupload_lightbox_preset/wysiwyg_imageupload/7/IMG-20120909-00084_1.jpg" rel="lightbox[wysiwyg_imageupload_inline]" class="lightbox-processed">[[wysiwyg_imageupload:147:]]</a>
-        // [[wysiwyg_imageupload:37:]]
-        // in wysiwyg_imageupload_entity with iid=37: fid=74, title='blah blah'
-        // in files with fid=74: uid=1, filename=rock.jpg =>
-        //   path=files/wysiwyg_imageupload/1/rock.jpg, or files/ckutils/rock.jpg
-        //
-        // Replace with:
-        // <a href="/sites/capetrials.co.za/files/ckutils/rock.jpg" class="colorbox">
-        //   <img src="/sites/capetrials.co.za/files/ckutils/rock.jpg" title="$title" align="center" />
-        // </a>
 
         while (preg_match('/\<a href="([^"]*)" rel="lightbox[^\>]*\>\[\[wysiwyg_imageupload:([0-9]*):\]\]\<\/a\>/', $value, $args)) {
           \Drupal::moduleHandler()->loadInclude('capetrials_custom_migration', 'inc', '/includes/migration_wysiwyg_imageupload');
@@ -60,6 +51,14 @@ function capetrials_custom_migration_colorbox(Row $row, MigrateSourceInterface $
           $value = preg_replace('$\<span [^\>]*\>\<span class="image_meta"\>\</span\>' . $originalMatch . '\</span\>$', $tag, $value);
         }
 
+        // [[wysiwyg_imageupload:37:]]
+        while (preg_match('/\[\[wysiwyg_imageupload:([0-9]*):\]\]/', $value, $args)) {
+          \Drupal::moduleHandler()->loadInclude('capetrials_custom_migration', 'inc', '/includes/migration_wysiwyg_imageupload');
+          $tag = migration_html_from_wysiwyg_filter_iid($args[1]); 
+
+          $originalMatch = preg_quote($args[0]);
+          $value = preg_replace('$' . $originalMatch . '$', $tag, $value);
+        }
 
         // <a href="/sites/capetrials.co.za/files/ckutils/CottonExpert220.jpg" rel="lightbox[http://]" style="display:block;margin:0 auto"><img src="/sites/capetrials.co.za/files/ckutils/CottonExpert220_small.jpg" /></a>
 

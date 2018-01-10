@@ -7,6 +7,16 @@
 
 /**
  * Replace a tag of form [[wysiwyg_imageupload:nn:]] with html and colorbox.
+ *
+ * [[wysiwyg_imageupload:37:]]
+ * in wysiwyg_imageupload_entity with iid=37: fid=74, title='blah blah'
+ * in files with fid=74: uid=1, filename=rock.jpg =>
+ * path=files/wysiwyg_imageupload/1/rock.jpg, or files/ckutils/rock.jpg
+ *
+ * Replace with:
+ * <a href="/sites/capetrials.co.za/files/ckutils/rock.jpg" class="colorbox">
+ * <img src="/sites/capetrials.co.za/files/ckutils/rock.jpg" title="$title" align="center" />
+ * </a>
  */
 function migration_html_from_wysiwyg_filter_iid($iid) {
   // First, get the fid and use it to find the image file.
