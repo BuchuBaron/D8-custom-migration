@@ -27,9 +27,12 @@ function capetrials_custom_migration_colorbox(Row $row, MigrateSourceInterface $
   if (substr($migration->id(), 0, $len) == CUSTOM_MIGRATION_PREFIX . 'node') {
     foreach ($text_fields as $text_field) {
       $value = $row->getSourceProperty($text_field);
+      $nid = $row->getSourceProperty('nid');
+      $type = $row->getSourceProperty('type');
+      $title = $row->getSourceProperty('title');
+      drush_print_r("nid=$nid, type=$type, title=$title\n$value\n");
       if (!empty($value)) {
         if (preg_match('/plugins\/emotions\/img/', $value)) {
-          drush_print_r("*****>>>>> value=");
           // Replace "sites/all/libraries/tinymce/jscripts/tiny_mce/plugins/emotions/img/smiley-wink.gif" with public://img/
           $value = preg_replace(
             array(
@@ -61,14 +64,21 @@ function capetrials_custom_migration_colorbox(Row $row, MigrateSourceInterface $
         }
 
         // <a href="/sites/capetrials.co.za/files/ckutils/CottonExpert220.jpg" rel="lightbox[http://]" style="display:block;margin:0 auto"><img src="/sites/capetrials.co.za/files/ckutils/CottonExpert220_small.jpg" /></a>
+        $value = preg_replace('/<a href="([^"]*)" rel="lightbox\[http:\/\/\]" style=/', '<a href="$1" class="colorbox" style=', $value);
+
+        if (preg_match('/<a href="([^"]*)" rel="lightbox\[http:\/\/\]" style=/', $value, $args)) {
+          drush_print_r($args);
+        }
 
         // <a class="lightbox lightbox-processed" title="A little cut" href="http://bmwmotorcycleclubcape.co.za/sites/bmwmotorcycleclubcape.co.za/files/images/wound.jpg" rel="lightbox[http://]"><img class="image image-half300 " title="A little cut" src="http://bmwmotorcycleclubcape.co.za/sites/bmwmotorcycleclubcape.co.za/files/images/wound.half300.jpg" alt="A little cut" height="225" width="300"></a>
+        $value = preg_replace('/<a class="[^"]*" title="([^"]*)" href=".*(\/sites\/[^"]*)" rel="lightbox\[http:\/\/\]">/', '<a class="colorbox" href="$1">', $value);
 
-
-
+        // Fix hardcoded domain names in content.
+        $value = preg_replace('/http\:\/\/(www\.|)capetrials.co.za\//', '/', $value);
         $row->setSourceProperty($text_field, $value);
       }
     }
+    drush_print_r(">>>>> Modified to >>>>>\n$value\n\n");
     // Set the body format as full_html
     $row->setSourceProperty('format', 'full_html');
   }
