@@ -34,8 +34,8 @@ function migration_html_from_wysiwyg_filter_iid($iid) {
   $imgPath = '/sites/capetrials.co.za/files/wiu/' .
     $result->uid . '/' . $result->filename; 
   $replacement =<<< EOS
-  <a href="$imgPath" class="colorbox">
-    <img src="$imgPath" align="center">
+  <a href="$imgPath" class="colorbox" data-colorbox-gallery="a">
+    <img src="$imgPath">
   </a>
 EOS;
   return $replacement;

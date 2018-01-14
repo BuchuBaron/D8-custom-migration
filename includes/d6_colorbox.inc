@@ -64,7 +64,7 @@ function capetrials_custom_migration_colorbox(Row $row, MigrateSourceInterface $
         }
 
         // <a href="/sites/capetrials.co.za/files/ckutils/CottonExpert220.jpg" rel="lightbox[http://]" style="display:block;margin:0 auto"><img src="/sites/capetrials.co.za/files/ckutils/CottonExpert220_small.jpg" /></a>
-        $value = preg_replace('/<a href="([^"]*)" rel="lightbox\[http:\/\/\]" style=/', '<a href="$1" class="colorbox" style=', $value);
+        $value = preg_replace('/<a href="([^"]*)" rel="lightbox\[http:\/\/\]" style=/', '<a href="$1" class="colorbox" data-colorbox-gallery="a" style=', $value);
 
         if (preg_match('/<a href="([^"]*)" rel="lightbox\[http:\/\/\]" style=/', $value, $args)) {
           drush_print_r($args);
